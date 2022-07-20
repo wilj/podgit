@@ -1,0 +1,5 @@
+mutation WorkspaceKeepalive($workspaceId: String!) {
+  workspaceKeepalive(input: { workspaceId: $workspaceId }) {
+    clientMutationId
+  }
+}

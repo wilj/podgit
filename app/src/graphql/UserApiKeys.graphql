@@ -1,0 +1,6 @@
+query UserApiKeys {
+  apiKeysList {
+    name
+    apiKeyGeneratedTs
+  }
+}

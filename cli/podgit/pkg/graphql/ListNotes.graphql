@@ -1,0 +1,7 @@
+query ListNotes {
+  notesList(orderBy: LAST_UPDATED_TS_DESC) {
+    id
+    shortTextContent
+    lastUpdatedTs
+  }
+}

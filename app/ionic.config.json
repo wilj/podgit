@@ -1,0 +1,7 @@
+{
+  "name": "podgit-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}

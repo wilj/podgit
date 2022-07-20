@@ -1,0 +1,5 @@
+mutation CreateNote($textContent: String!) {
+  createNote(input: {note: {textContent: $textContent}}) {
+    clientMutationId
+  }
+}

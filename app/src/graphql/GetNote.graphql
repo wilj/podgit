@@ -1,0 +1,5 @@
+query GetNote($id: UUID!) {
+  note(id: $id) {
+    textContent
+  }
+}

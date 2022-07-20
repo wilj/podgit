@@ -1,0 +1,12 @@
+overwrite: true
+schema: 
+  - "http://localhost:5678/graphql"
+    
+documents: "pkg/graphql/*.graphql"
+generates:
+  pkg/graphql/graphql.go:
+    hooks:
+      afterOneFileWrite: go fmt
+    plugins:
+      - graphql-codegen-golang:
+          packageName: graphql

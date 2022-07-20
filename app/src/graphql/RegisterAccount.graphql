@@ -1,0 +1,13 @@
+mutation RegisterAccount($input: RegisterInput!) {
+  register(input: $input) {
+    user {
+      avatarUrl
+      isAdmin
+      isVerified
+      name
+      username
+      hasPassword
+      id
+    }
+  }
+}

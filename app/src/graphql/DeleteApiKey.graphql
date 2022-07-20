@@ -1,0 +1,5 @@
+mutation DeleteApiKey($input: DeleteApiKeyInput!) {
+  deleteApiKey(input: $input) {
+    clientMutationId
+  }
+}

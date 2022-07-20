@@ -1,0 +1,9 @@
+query CurrentUser {
+  currentUser {
+    id
+    username
+    isAdmin
+    name
+    isVerified
+  }
+}

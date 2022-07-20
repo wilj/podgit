@@ -1,0 +1,20 @@
+{
+  "name": "podgit",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate": ". ../../site/.env; export ROOT_URL; NODE_TLS_REJECT_UNAUTHORIZED=0 graphql-codegen --config codegen.yml; gopatch -p graphql_client.patch pkg/graphql/graphql.go"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "graphql-codegen": "^0.4.0",
+    "graphql-codegen-golang": "^0.1.2",
+    "@graphql-codegen/cli": "^2.3.0",
+    "graphql": "^15.3.0"
+  },
+  "dependencies": {
+  }
+}

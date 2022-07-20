@@ -1,0 +1,7 @@
+mutation CreateApiKey($input: CreateApiKeyInput!) {
+  createApiKey(input: $input) {
+    createApiKeyResult {
+      apiKey
+    }
+  }
+}

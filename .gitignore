@@ -1,0 +1,9 @@
+.env
+.next
+node_modules
+dist
+.agignore
+*.tsbuildinfo
+.ethereal
+*.log
+deploy/gitpod/*.flag

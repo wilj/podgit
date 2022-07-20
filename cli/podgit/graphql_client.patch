@@ -1,0 +1,6 @@
+@@
+@@
+-	return req.Execute(client)
+
++	beforeExecute(req.Request)
++	return req.Execute(client)

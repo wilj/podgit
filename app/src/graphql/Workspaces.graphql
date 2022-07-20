@@ -1,0 +1,16 @@
+fragment WorkspacesFields on Workspace {
+    gitpodWorkspaceId
+    workspaceData
+}
+
+subscription WorkspacesSubscription {
+  workspacesList {
+    ...WorkspacesFields
+  }
+}
+
+query WorkspacesQuery {
+  workspacesList {
+    ...WorkspacesFields
+  }
+}

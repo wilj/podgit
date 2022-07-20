@@ -1,0 +1,109 @@
+version: "3.5"
+services:
+
+  dbsetup:
+    image: registry.gitlab.com/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/tools:${CI_COMMIT_BRANCH}
+    env_file:
+      - ${SECRETS_HOME}/site.env
+    networks:
+      - proxy
+      - backend
+    depends_on:
+      - db
+    entrypoint: ["sh", "-c", "yarn deploy-initial-setup"]
+
+  dbmigrate:
+    image: registry.gitlab.com/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/tools:${CI_COMMIT_BRANCH}
+    env_file:
+      - ${SECRETS_HOME}/site.env
+    networks:
+      - backend
+    depends_on:
+      - db
+    entrypoint: ["sh", "-c", "yarn db commit && yarn db migrate"]
+
+  server:
+    image: registry.gitlab.com/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/server:${CI_COMMIT_BRANCH}
+    env_file:
+      - ${SECRETS_HOME}/site.env
+    environment:
+      - NODE_ENV=production
+      - MAIL_ENV=development
+      - DATABASE_URL=postgres://${DATABASE_OWNER}:${DATABASE_OWNER_PASSWORD}@${DATABASE_HOST}/${DATABASE_NAME}
+      - AUTH_DATABASE_URL=postgres://${DATABASE_AUTHENTICATOR}:${DATABASE_AUTHENTICATOR_PASSWORD}@${DATABASE_HOST}/${DATABASE_NAME}
+      - VIRTUAL_HOST=${CI_COMMIT_BRANCH}.${BASE_DOMAIN}
+      - VIRTUAL_PORT=5678
+      - LETSENCRYPT_HOST=${CI_COMMIT_BRANCH}.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_DNS_MODE=dns_cf
+      - LETSENCRYPT_DNS_MODE_SETTINGS=export CF_Token=${CLOUDFLARE_API_KEY}
+    init: true
+    restart: always
+    networks:
+      - proxy
+      - backend
+    depends_on:
+      - db
+    command: yarn start
+
+  worker:
+    image: registry.gitlab.com/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/server:${CI_COMMIT_BRANCH}
+    env_file:
+      - ${SECRETS_HOME}/site.env
+    environment:
+      - NODE_ENV=production
+      - MAIL_ENV=development
+      - DATABASE_URL=postgres://${DATABASE_OWNER}:${DATABASE_OWNER_PASSWORD}@${DATABASE_HOST}/${DATABASE_NAME}
+      - AUTH_DATABASE_URL=postgres://${DATABASE_AUTHENTICATOR}:${DATABASE_AUTHENTICATOR_PASSWORD}@${DATABASE_HOST}/${DATABASE_NAME}
+    init: true
+    restart: always
+    networks:
+      - backend
+    depends_on:
+      - db
+    entrypoint: ["sh", "-c", "yarn worker gw"]
+
+
+  # This runs the database that everything else connects to
+  db:
+    image: registry.gitlab.com/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/postgres:${CI_COMMIT_BRANCH}
+    env_file:
+      - ${SECRETS_HOME}/postgres.env
+    working_dir: /
+
+    volumes:
+      - db-volume:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - backend
+    command:
+      postgres -c logging_collector=on -c log_destination=stderr -c log_directory=/var/lib/postgresql/data/logs -c
+      log_rotation_age=60 -c log_truncate_on_rotation=on -c log_filename=server_log.hour.%H%M
+
+  mailhog:
+    image: registry.gitlab.com/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/mailhog:${CI_COMMIT_BRANCH}
+    env_file:
+      - ${SECRETS_HOME}/site.env
+    environment:
+      - VIRTUAL_HOST=mailhog.${CI_COMMIT_BRANCH}.${BASE_DOMAIN}
+      - VIRTUAL_PORT=8025
+      - LETSENCRYPT_HOST=mailhog.${CI_COMMIT_BRANCH}.${BASE_DOMAIN}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - LETSENCRYPT_DNS_MODE=dns_cf
+      - LETSENCRYPT_DNS_MODE_SETTINGS=export CF_Token=${CLOUDFLARE_API_KEY}
+    init: true
+    restart: always
+    networks:
+      - proxy
+      - backend
+    
+
+networks:
+  backend:
+  proxy:
+    external:
+      name: proxy
+
+volumes:
+  # PostgreSQL data
+  db-volume:

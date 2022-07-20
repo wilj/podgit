@@ -1,0 +1,28 @@
+stages:
+  - build
+  - deploy
+
+
+build:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+      allow_failure: false
+  tags:
+    - image-builder
+  script: 
+    - cd $CI_PROJECT_DIR/deploy/docker && ./build.sh
+  
+deploy:
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+      allow_failure: false
+  tags:
+      - podgit-site
+  script:
+    - cd $CI_PROJECT_DIR/deploy/docker && ./deploy.sh
+  environment:
+    name: production

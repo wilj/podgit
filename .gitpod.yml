@@ -1,0 +1,42 @@
+image:
+  file: deploy/gitpod/Dockerfile
+
+tasks:
+  - name: podgit
+    command: ./deploy/gitpod/podgit.sh
+  - name: init
+    command: ./deploy/gitpod/init.sh
+  - name: sshfs
+    command: ./deploy/gitpod/sshfs.sh
+  - name: site
+    command: ./deploy/gitpod/site.sh
+  - name: app
+    command: ./deploy/gitpod/app.sh
+
+ports:
+  - port: 5678
+    visibility: public
+    onOpen: ignore
+  - port: 8100
+    visibility: public
+    onOpen: ignore
+  - port: 13000
+    visibility: private
+    onOpen: ignore
+  - port: 1433
+    visibility: private
+    onOpen: ignore
+  - port: 9678
+    visibility: private
+    onOpen: ignore
+  - port: 9876
+    visibility: private
+    onOpen: ignore
+  - port: 9757
+    visibility: private
+    onOpen: ignore
+
+vscode:
+  extensions:
+    - golang.go
+    - timonwong.shellcheck
